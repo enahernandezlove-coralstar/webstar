@@ -1,0 +1,314 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoralStar</title>
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
+            animation: gradientFade 60s ease-in-out infinite;
+        }
+
+        h1 {
+            margin-top: 30px;
+            font-size: 42px;
+            color: #ffd6ff;
+            text-shadow: 0 0 12px rgba(255,182,255,0.6);
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 28px;
+            color: #ffe0ff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 25px;
+            padding: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+            .card:hover {
+                transform: scale(1.08);
+                background: rgba(255,255,255,0.25);
+            }
+
+        .hidden {
+            display: none;
+            padding: 20px;
+        }
+
+        input, textarea {
+            padding: 12px;
+            width: 75%;
+            border-radius: 15px;
+            border: none;
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            backdrop-filter: blur(8px);
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        textarea {
+            height: 200px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border-radius: 15px;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+            background: #ffc8dd;
+            color: #5a189a;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+            button:hover {
+                background: #ffd6ff;
+            }
+
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: hsl(300, 80%, 90%);
+            opacity: 0.7;
+            border-radius: 50%;
+            animation: float 4s infinite ease-in-out, twinkle 2s infinite alternate;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translateY(-15px);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: translateY(0px);
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes twinkle {
+            from {
+                opacity: 0.3;
+            }
+
+            to {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes gradientFade {
+            0% {
+                background: linear-gradient(180deg, #2b1055, #7597de);
+            }
+
+            25% {
+                background: linear-gradient(180deg, #4b2c7a, #9fa6e8);
+            }
+
+            50% {
+                background: linear-gradient(180deg, #2b1055, #4d94ff);
+            }
+
+            75% {
+                background: linear-gradient(180deg, #3a1d66, #6d8ee6);
+            }
+
+            100% {
+                background: linear-gradient(180deg, #2b1055, #7597de);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Ambient Music -->
+    <audio id="ambientMusic" src="ambient.mp3" loop></audio>
+
+    <div class="stars"></div>
+
+    <h1>⭐WebStar!!⭐</h1>
+
+    <div class="grid">
+        <div class="card" onclick="openPage('search')">🔎 Search</div>
+        <div class="card" onclick="openPage('notes')">📝 Notes</div>
+        <div class="card" onclick="openPage('links')">⭐ Links</div>
+        <div class="card" onclick="openPage('otherstar')">🐾 OtherStar</div>
+    </div>
+
+    <!-- SEARCH -->
+    <div id="search" class="hidden">
+        <h2>Search</h2>
+        <input id="query" placeholder="Search...">
+        <br>
+        <button onclick="search()">Go</button>
+        <br><br>
+        <button onclick="goHome()">Back</button>
+    </div>
+
+    <!-- NOTES -->
+    <div id="notes" class="hidden">
+        <h2>Notes</h2>
+        <textarea id="noteBox"></textarea>
+        <br>
+        <button onclick="saveNotes()">Save</button>
+        <button onclick="goHome()">Back</button>
+    </div>
+
+    <!-- LINKS -->
+    <div id="links" class="hidden">
+        <h2>Quick Links</h2>
+        <input id="newLinkName" placeholder="Name your link...">
+        <input id="newLinkInput" placeholder="Paste a link...">
+        <select id="sectionSelect">
+            <option value="links">Links</option>
+            <option value="otherstar">OtherStar</option>
+        </select>
+        <button onclick="addLink()">Add Link</button>
+        <div id="linksButtons"></div>
+        <br><br>
+        <button onclick="goHome()">Back</button>
+    </div>
+
+    <!-- OTHERSTAR -->
+    <div id="otherstar" class="hidden">
+        <h2>🐾 OtherStar</h2>
+        <p>Your personal cozy space ✨</p>
+        <div id="otherstarLinks"></div>
+        <button onclick="goHome()">Back</button>
+    </div>
+
+    <script>
+        // ---------------- PAGE NAVIGATION ----------------
+        function openPage(id) {
+            document.querySelector('.grid').style.display = 'none';
+            document.querySelectorAll('.hidden').forEach(el => el.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+        }
+        function goHome() {
+            document.querySelector('.grid').style.display = 'grid';
+            document.querySelectorAll('.hidden').forEach(el => el.style.display = 'none');
+        }
+
+        // ---------------- SEARCH ----------------
+        function search() {
+            const q = document.getElementById('query').value;
+            if (!q) return;
+            window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank");
+        }
+
+        // ---------------- NOTES ----------------
+        function saveNotes() {
+            localStorage.setItem("coral_notes", document.getElementById("noteBox").value);
+        }
+
+        // ---------------- LINKS ----------------
+        function addLink() {
+            const name = document.getElementById("newLinkName").value.trim();
+            const url = document.getElementById("newLinkInput").value.trim();
+            const section = document.getElementById("sectionSelect").value;
+            if (!name || !url) return;
+
+            let links = JSON.parse(localStorage.getItem(section + "_links") || "[]");
+            links.unshift({ name: name, url: url });
+            localStorage.setItem(section + "_links", JSON.stringify(links));
+
+            document.getElementById("newLinkName").value = "";
+            document.getElementById("newLinkInput").value = "";
+            displayLinks();
+        }
+
+        function displayLinks() {
+            const linksDiv = document.getElementById("linksButtons");
+            linksDiv.innerHTML = "";
+            let links = JSON.parse(localStorage.getItem("links_links") || "[]");
+            links.slice(0, 5).forEach(obj => {
+                const btn = document.createElement("button");
+                btn.textContent = obj.name;
+                btn.onclick = () => window.open(obj.url, "_blank");
+                linksDiv.appendChild(btn);
+            });
+
+            const otherDiv = document.getElementById("otherstarLinks");
+            otherDiv.innerHTML = "";
+            let otherLinks = JSON.parse(localStorage.getItem("otherstar_links") || "[]");
+            otherLinks.forEach(obj => {
+                const btn = document.createElement("button");
+                btn.textContent = obj.name;
+                btn.onclick = () => window.open(obj.url, "_blank");
+                otherDiv.appendChild(btn);
+            });
+        }
+
+        // ---------------- STARS ----------------
+        const starContainer = document.querySelector('.stars');
+        for (let i = 0; i < 40; i++) {
+            let star = document.createElement('div');
+            star.classList.add('star');
+            star.style.top = Math.random() * 100 + "%";
+            star.style.left = Math.random() * 100 + "%";
+            star.style.animationDuration = (Math.random() * 3 + 3) + "s";
+            starContainer.appendChild(star);
+        }
+
+        // ---------------- INITIAL LOAD ----------------
+        window.onload = () => {
+            document.getElementById("noteBox").value = localStorage.getItem("coral_notes") || "";
+            displayLinks();
+        };
+
+        // ---------------- AMBIENT MUSIC ON FIRST TAP ----------------
+        window.addEventListener('click', function initMusic() {
+            const audio = document.getElementById("ambientMusic");
+            audio.play().catch(() => { });
+            window.removeEventListener('click', initMusic);
+        });
+
+        // ---------------- SERVICE WORKER ----------------
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js');
+        }
+    </script>
+
+</body>
+</html>

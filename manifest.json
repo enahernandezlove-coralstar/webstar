@@ -1,0 +1,21 @@
+{
+  "name": "CoralStar",
+  "short_name": "CoralStar",
+  "description": "Your cozy personal app for notes, links, and browsing!",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2b1055",
+  "theme_color": "#7597de",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
